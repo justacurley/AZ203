@@ -50,5 +50,9 @@ dotnet add package Microsoft.Azure.Cosmos --version 3.4.1
 dotnet build
 New-Item .\AdventureWorksCosmosContext.cs
 psedit .\AdventureWorksCosmosContext.cs
-
-# az group delete -n $Name -y
+$cosmostConnectionString = "AccountEndpoint=https://polycosmosawmc.documents.azure.com:443/;AccountKey=tP1E94SOFpex5zRF8oFupos58BckdtRKPWxp4hr1whJ7MyowDwnwOd5mfOpE9MZMpnk8poKHOJ84vx5VAjxsVA==;"
+$cosmostConnectionString | clip
+psedit ..\AdventureWorks.Web\appsettings.json
+Set-Location ..\AdventureWorks.Web
+psedit startup.cs
+# az group delete -n $Name -y --no-wait
