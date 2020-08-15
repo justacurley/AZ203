@@ -12,13 +12,13 @@ $uniqueVaultName = "mysecurevault953$suffix"
 az group create -n $Name -l $Location
 
 az storage account create -g $Name -n "securestor$suffix" -l $Location --kind StorageV2 --access-tier Hot --sku Standard_LRS
-$storagecredentials = 'DefaultEndpointsProtocol=https;AccountName=securestorawmc;AccountKey=dLnHxVR+9+URk3aaIfUgV20FNo4U0pvVL8B4uI+qnA3V/1ytD8uqYEeeTfXvfI9hUovHcbrqRTWAJ07v1QBddQ==;EndpointSuffix=core.windows.net'
-
+$connectionString = az storage account show-connection-string -g $Name -n "securestor$suffix" --query "connectionString"
 #Create a keyvault
 az keyvault create -g $Name -n $uniqueVaultName -l $Location --enable-soft-delete false --sku standard
 #Create storage credentials secret
-az keyvault secret set --vault-name $uniqueVaultName --name storagecredentials --value $storagecredentials
-$secretID = "https://mysecurevault953awmc.vault.azure.net/secrets/storagecredentials/962b257ad0fd4c5590264522bc8f1993"
+az keyvault secret set --vault-name $uniqueVaultName --name storagecredentials --value $connectionString
+$secretID = az keyvault secret show --name storagecredentials --vault-name $uniqueVaultName --query 'id'
+
 
 
 #create a function app
@@ -31,6 +31,9 @@ $mid = az functionapp identity show -g $name --name "securefunc$Suffix" --query 
 $spn  = az ad sp show --id $mid --query 'servicePrincipalNames[0]'
 #Create an access policy for the managed identity on the keyvault
 az keyvault set-policy -g $Name --name $uniqueVaultName --secret-permissions get --spn $spn
+
+
+
 
 
 az group delete -n $Name --no-wait --yes
