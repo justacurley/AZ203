@@ -33,3 +33,10 @@ dotnet add package Microsoft.ApplicationInsights -v 2.13.0
 dotnet add package Microsoft.ApplicationInsights.AspNetCore -v 2.13.0
 dotnet add package Microsoft.ApplicationInsights.PerfCounterCollector -v 2.13.0
 dotnet build
+
+#Task 1: Deploy an application to the web app
+$webappName = az webapp list -g $Name --query "[?starts_with(name, 'smpapi')].{Name:name}" -o tsv
+Set-Location ..\ 
+az webapp deployment source config-zip -g $Name --src .\api.zip --name $webappName
+start https://smpapiawmc.azurewebsites.net/weatherforecast
+az group delete -n $Name --no-wait --yes 
